@@ -2,10 +2,14 @@ use crate::algorithm::{Algorithm, Creator};
 use crate::utils::*;
 use crate::{Builder, Float, Vector};
 
+use num_traits::Float as NumFloat;
+
+use alga::linear::NormedSpace;
 use num_traits::NumCast;
 
-use rand::distributions::{Distribution, Standard, Uniform};
-use rand::{distributions::StandardNormal, Rng};
+use rand::Rng;
+use rand::distr::StandardUniform;
+use rand_distr::{Distribution, StandardNormal, Uniform};
 
 use sphere::sphere_volume;
 
@@ -18,8 +22,8 @@ impl<F, V> Creator<F, V> for Bridson
 where
     F: Float,
     V: Vector<F>,
-    Standard: Distribution<F>,
-    Standard: Distribution<V>,
+    StandardUniform: Distribution<F>,
+    StandardUniform: Distribution<V>,
 {
     type Algo = Algo<F, V>;
 
@@ -49,15 +53,15 @@ impl<F, V> Algorithm<F, V> for Algo<F, V>
 where
     F: Float,
     V: Vector<F>,
-    Standard: Distribution<F>,
-    Standard: Distribution<V>,
+    StandardUniform: Distribution<F>,
+    StandardUniform: Distribution<V>,
 {
     fn next<R>(&mut self, poisson: &mut Builder<F, V>, rng: &mut R) -> Option<V>
     where
         R: Rng,
     {
         while !self.active_samples.is_empty() {
-            let index = rng.sample(Uniform::new(0, self.active_samples.len()));
+            let index = rng.sample(Uniform::new(0, self.active_samples.len()).unwrap());
             let cur = self.active_samples[index].clone();
             for _ in 0..30 {
                 let min = F::cast(2) * poisson.radius;
@@ -76,7 +80,7 @@ where
             self.active_samples.swap_remove(index);
         }
         while self.success == 0 {
-            let cell = rng.sample(Uniform::new(0, self.grid.cells()));
+            let cell = rng.sample(Uniform::new(0, self.grid.cells()).unwrap());
             let index: V = decode(cell, self.grid.side()).expect(
                 "Because we are decoding random index within grid \
                  this should work.",
@@ -100,10 +104,10 @@ where
         // how much sphere can fill it at best case and just figure out how many fills are still needed.
         let dim = V::dimension();
         let spacing = self.grid.cell();
-        let grid_volume = F::cast(upper) * spacing.powi(dim as i32);
+        let grid_volume = F::cast(upper) * NumFloat::powi(spacing, dim as i32);
         let sphere_volume = sphere_volume(F::cast(2) * poisson.radius, dim as u64);
         let lower: F = grid_volume / sphere_volume;
-        let mut lower = lower.floor().to_usize().expect(
+        let mut lower = NumFloat::floor(lower).to_usize().expect(
             "Grids volume divided by spheres volume should be always \
              castable to usize.",
         );
@@ -161,16 +165,16 @@ where
     F: Float,
     V: Vector<F>,
     R: Rng,
-    Standard: Distribution<F>,
-    Standard: Distribution<V>,
+    StandardUniform: Distribution<F>,
+    StandardUniform: Distribution<V>,
 {
     loop {
         let mut result = V::zero();
         for n in 0..V::dimension() {
-            result[n] = NumCast::from(rand.sample(StandardNormal))
+            result[n] = NumCast::from(rand.sample::<f64, _>(StandardNormal))
                 .expect("The f64 produced by StandardNormal should be always castable to float.");
         }
-        let result = result.normalize() * rand.gen() * max;
+        let result = result.normalize() * rand.random() * max;
         if result.norm() >= min {
             return result;
         }

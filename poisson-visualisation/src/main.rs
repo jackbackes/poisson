@@ -2,7 +2,8 @@ use clap::{App, Arg, ArgMatches, arg_enum, _clap_count_exprs, value_t};
 
 use poisson::{Builder, Type, algorithm::{Bridson, Ebeida}};
 
-use rand::{rngs::SmallRng, FromEntropy, Rng, seq::SliceRandom, SeedableRng};
+use rand::{Rng, seq::SliceRandom, SeedableRng, FromEntropy};
+use rand::rngs::SmallRng;
 
 use nalgebra::Vector2;
 

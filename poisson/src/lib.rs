@@ -1,3 +1,5 @@
+#![recursion_limit = "2048"]
+
 //! # Poisson-disk distribution generation
 //!
 //! Generates distribution of points in [0, 1)<sup>d</sup> where:
@@ -59,8 +61,8 @@ use rand::Rng;
 use num_traits::Float as NumFloat;
 use num_traits::{NumCast, Zero};
 
-use alga::general::AbstractField;
-use alga::linear::{FiniteDimVectorSpace, NormedSpace};
+use alga::general::{AbstractField, RealField};
+use alga::linear::{FiniteDimVectorSpace, NormedSpace, VectorSpace};
 
 #[macro_use]
 extern crate lazy_static;
@@ -75,23 +77,20 @@ pub mod algorithm;
 mod utils;
 
 /// Describes what floats are.
-pub trait Float: NumFloat + AbstractField + AddAssign + SubAssign + MulAssign + DivAssign {
+pub trait Float: NumFloat + RealField + AddAssign + SubAssign + MulAssign + DivAssign {
     /// Casts usize to float.
     fn cast(n: usize) -> Self {
         NumCast::from(n).expect("Casting usize to float should always succeed.")
     }
 }
-impl<T> Float for T where T: NumFloat + AbstractField + AddAssign + SubAssign + MulAssign + DivAssign
+impl<T> Float for T where T: NumFloat + RealField + AddAssign + SubAssign + MulAssign + DivAssign
 {}
 
 /// Describes what vectors are.
 pub trait Vector<F>:
     Zero
-    + FiniteDimVectorSpace<Field = F>
-    + NormedSpace<Field = F>
-    + Index<usize>
-    + IndexMut<usize>
-    + Clone
+    + FiniteDimVectorSpace
+    + NormedSpace<ComplexField = F, RealField = F>
 where
     F: Float,
 {
@@ -100,11 +99,8 @@ impl<T, F> Vector<F> for T
 where
     F: Float,
     T: Zero
-        + FiniteDimVectorSpace<Field = F>
-        + NormedSpace<Field = F>
-        + Index<usize>
-        + IndexMut<usize>
-        + Clone
+        + FiniteDimVectorSpace
+        + NormedSpace<ComplexField = F, RealField = F>
 {
 }
 

@@ -1,6 +1,6 @@
 use crate::{Float, Type, Vector};
 
-use num_traits::NumCast;
+use num_traits::{Float as NumFloat, NumCast};
 
 // const TAU: f64  = 6.283185307179586476925286766559005768394338798750211641949;
 const HALF_TAU: f64 = 3.141592653589793238462643383279502884197169399375105820974;
@@ -90,5 +90,5 @@ where
         Normal => newton(samples, dim),
     };
     let max_radii: F = NumCast::from(MAX_RADII[dim - 2]).unwrap();
-    (max_radii / F::cast(samples)).powf(F::cast(1) / F::cast(dim)) * relative
+    NumFloat::powf(max_radii / F::cast(samples), F::cast(1) / F::cast(dim)) * relative
 }
