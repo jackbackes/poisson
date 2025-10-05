@@ -10,7 +10,7 @@ use rand::{rngs::SmallRng, SeedableRng};
 extern crate nalgebra as na;
 pub type Vect = na::Vector3<f64>;
 
-const SEED: [u8; 16] = [
+const SEED: [u8; 32] = [
     (3 + 2741) as u8,
     (7 + 2729) as u8,
     (13 + 2713) as u8,
@@ -27,6 +27,23 @@ const SEED: [u8; 16] = [
     (107 + 2549) as u8,
     (113 + 2539) as u8,
     (131 + 2521) as u8,
+    // Additional 16 bytes for 32-byte seed
+    (137 + 2503) as u8,
+    (149 + 2477) as u8,
+    (157 + 2459) as u8,
+    (163 + 2447) as u8,
+    (173 + 2423) as u8,
+    (179 + 2411) as u8,
+    (181 + 2399) as u8,
+    (191 + 2389) as u8,
+    (193 + 2383) as u8,
+    (197 + 2377) as u8,
+    (199 + 2371) as u8,
+    (211 + 2357) as u8,
+    (223 + 2347) as u8,
+    (227 + 2341) as u8,
+    (229 + 2339) as u8,
+    (233 + 2333) as u8,
 ];
 
 #[bench]

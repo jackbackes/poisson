@@ -1,7 +1,8 @@
 #![allow(unused)]
 use poisson::{algorithm, Builder, Float, Type, Vector};
 
-use rand::distributions::{Distribution, Standard};
+use rand::distr::StandardUniform;
+use rand_distr::Distribution;
 use rand::{rngs::SmallRng, SeedableRng};
 
 use num_traits::NumCast;
@@ -33,7 +34,7 @@ pub enum When {
 pub fn test_with_samples<T>(samples: usize, relative_radius: f64, seeds: u32, ptype: Type)
 where
     T: Debug + Vector<f64> + Copy,
-    Standard: Distribution<T>,
+    StandardUniform: Distribution<T>,
 {
     test_with_samples_prefilled(
         samples,
@@ -56,8 +57,8 @@ pub fn test_with_samples_prefilled<'r, T, F, I>(
     T: 'r + Debug + Vector<f64> + Copy,
     F: FnMut(f64) -> I,
     I: FnMut(Option<T>) -> Option<T>,
-    Standard: Distribution<f64>,
-    Standard: Distribution<T>,
+    StandardUniform: Distribution<f64>,
+    StandardUniform: Distribution<T>,
 {
     test_algo(
         samples,
@@ -92,30 +93,20 @@ fn test_algo<'r, T, F, I, A>(
     F: FnMut(f64) -> I,
     I: FnMut(Option<T>) -> Option<T>,
     A: algorithm::Creator<f64, T>,
-    Standard: Distribution<f64>,
-    Standard: Distribution<T>,
+    StandardUniform: Distribution<f64>,
+    StandardUniform: Distribution<T>,
 {
     use self::When::*;
     for i in 0..seeds {
         let mut prefilled = vec![];
-        let rand = SmallRng::from_seed([
-            (i * 3 + 2741) as u8,
-            (i * 7 + 2729) as u8,
-            (i * 13 + 2713) as u8,
-            (i * 19 + 2707) as u8,
-            (i * 29 + 2693) as u8,
-            (i * 37 + 2687) as u8,
-            (i * 43 + 2677) as u8,
-            (i * 53 + 2663) as u8,
-            (i * 61 + 2657) as u8,
-            (i * 71 + 2633) as u8,
-            (i * 79 + 2609) as u8,
-            (i * 89 + 2591) as u8,
-            (i * 101 + 2557) as u8,
-            (i * 107 + 2549) as u8,
-            (i * 113 + 2539) as u8,
-            (i * 131 + 2521) as u8,
-        ]);
+        let mut seed = [0u8; 32];
+        for j in 0..16 {
+            let primes = [3, 7, 13, 19, 29, 37, 43, 53, 61, 71, 79, 89, 101, 107, 113, 131];
+            let offsets = [2741, 2729, 2713, 2707, 2693, 2687, 2677, 2663, 2657, 2633, 2609, 2591, 2557, 2549, 2539, 2521];
+            seed[j] = (i * primes[j] + offsets[j]) as u8;
+            seed[j + 16] = ((i * primes[j] + offsets[j]) >> 8) as u8;
+        }
+        let rand = SmallRng::from_seed(seed);
         let mut poisson_iter = Builder::with_samples(samples, relative_radius, ptype)
             .build(rand, algo)
             .into_iter();

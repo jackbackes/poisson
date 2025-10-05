@@ -1,6 +1,6 @@
 use poisson::Type;
 
-use rand::distributions::StandardNormal;
+use rand_distr::StandardNormal;
 use rand::{rngs::SmallRng, Rng, SeedableRng};
 
 extern crate nalgebra as na;
@@ -20,7 +20,7 @@ fn multiple_too_close_invalid() {
     let relative_radius = 0.8;
     let prefiller = |radius| {
         let mut last = None::<Vect>;
-        let mut rand = SmallRng::from_seed([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]);
+        let mut rand = SmallRng::from_seed([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]);
         move |v| {
             if let Some(_) = v {
                 if last == v {
@@ -28,7 +28,7 @@ fn multiple_too_close_invalid() {
                 } else {
                     last = v;
                     let vec = sphere_uniform_point(&mut rand);
-                    v.map(|v| v + vec * rand.gen::<f64>() * radius)
+                    v.map(|v| v + vec * rand.random::<f64>() * radius)
                 }
             } else {
                 None

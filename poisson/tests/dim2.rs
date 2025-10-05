@@ -11,12 +11,12 @@ use crate::helper::test_with_samples;
 
 #[test]
 fn test_one_sample_works() {
-    let rand = SmallRng::from_seed([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]);
+    let rand = SmallRng::from_seed([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]);
     let builder = Builder::<_, Vect>::with_samples(1, 0.8, Normal);
     let builder = builder.build(rand, algorithm::Ebeida);
     builder.into_iter().for_each(drop);
 
-    let rand = SmallRng::from_seed([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16]);
+    let rand = SmallRng::from_seed([1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32]);
     let builder = Builder::<_, Vect>::with_samples(1, 0.8, Normal);
     let builder = builder.build(rand, algorithm::Bridson);
     builder.into_iter().for_each(drop);
