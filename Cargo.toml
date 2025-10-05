@@ -1,5 +1,6 @@
 [workspace]
 members = ["poisson", "poisson-visualisation"]
+resolver = "2"
 
 [profile.test]
 opt-level = 3

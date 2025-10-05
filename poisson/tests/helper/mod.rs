@@ -15,7 +15,7 @@ use std::fmt::Debug;
 pub fn print_v<F: Float, V: Vector<F>>(v: V) -> String {
     let mut result = "(".to_owned();
     for i in 0..V::dimension() {
-        result.push_str(&format!("{}, ", v[i].to_f64().unwrap()));
+        result.push_str(&format!("{}, ", v[i].to_f64().expect("Test vector element should convert to f64")));
     }
     if V::dimension() != 0 {
         result.pop();
@@ -220,7 +220,7 @@ pub fn test_poisson<F, I, T, A>(
                 for i in 0..T::dimension() {
                     let rem = div % 3;
                     div /= 3;
-                    t[i] = NumCast::from(rem - 1).unwrap();
+                    t[i] = NumCast::from(rem - 1).expect("Test offset value should convert to vector element type");
                 }
                 for v in &vecs {
                     vecs2.push(*v + t);
@@ -252,8 +252,8 @@ where
                      distance to each other of {} which is smaller than smallest allowed one {}. \
                      The samples: [{:?}, {:?}]",
                     algo,
-                    dist.to_f64().unwrap(),
-                    radius.to_f64().unwrap() * 2.,
+                    dist.to_f64().expect("Test distance should convert to f64"),
+                    radius.to_f64().expect("Test radius should convert to f64") * 2.,
                     v1,
                     v2);
         }

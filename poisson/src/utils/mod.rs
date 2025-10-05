@@ -130,7 +130,7 @@ fn encoding_decoding_works() {
     let n = nalgebra::Vector2::new(10., 7.);
     assert_eq!(
         n,
-        decode::<_, nalgebra::Vector2<_>>(encode(&n, 15, Type::Normal).unwrap(), 15).unwrap()
+        decode::<_, nalgebra::Vector2<_>>(encode(&n, 15, Type::Normal).expect("Test vector should encode properly"), 15).expect("Encoded value should decode properly")
     );
 }
 
@@ -139,7 +139,7 @@ fn encoding_decoding_at_edge_works() {
     let n = nalgebra::Vector2::new(14., 14.);
     assert_eq!(
         n,
-        decode::<_, nalgebra::Vector2<_>>(encode(&n, 15, Type::Normal).unwrap(), 15).unwrap()
+        decode::<_, nalgebra::Vector2<_>>(encode(&n, 15, Type::Normal).expect("Test vector should encode properly"), 15).expect("Encoded value should decode properly")
     );
 }
 

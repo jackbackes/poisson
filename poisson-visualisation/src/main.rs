@@ -125,7 +125,7 @@ fn visualise(m: ArgMatches) {
         .get_one::<String>("style")
         .and_then(|s| Style::from_str(s).ok())
         .unwrap_or(Style::Plain);
-    let name = m.get_one::<String>("OUTPUT").unwrap();
+    let name = m.get_one::<String>("OUTPUT").expect("OUTPUT argument is required");
     let master_rng = m
         .get_one::<String>("SEED")
         .map(|s| {
@@ -151,7 +151,7 @@ fn visualise(m: ArgMatches) {
 
     let mut image = ImageBuffer::new(width, height);
     for p in points {
-        let pp = ps.pop().unwrap();
+        let pp = ps.pop().expect("ps should have same length as points");
         let col = Rgb(Lab {
             l: style_rng.random::<f32>() * 80. + 10.,
             a: pp.x * 256. - 128.,
@@ -197,5 +197,5 @@ fn visualise(m: ArgMatches) {
             }
         }
     }
-    image.save(name).unwrap();
+    image.save(name).expect("Failed to save generated image");
 }

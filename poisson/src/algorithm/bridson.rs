@@ -59,7 +59,7 @@ where
         R: Rng,
     {
         while !self.active_samples.is_empty() {
-            let index = rng.sample(Uniform::new(0, self.active_samples.len()).unwrap());
+            let index = rng.sample(Uniform::new(0, self.active_samples.len()).expect("Active samples should never be empty here"));
             let cur = self.active_samples[index].clone();
             for _ in 0..30 {
                 let min = F::cast(2) * poisson.radius;
@@ -78,7 +78,7 @@ where
             self.active_samples.swap_remove(index);
         }
         while self.success == 0 {
-            let cell = rng.sample(Uniform::new(0, self.grid.cells()).unwrap());
+            let cell = rng.sample(Uniform::new(0, self.grid.cells()).expect("Grid should have at least one cell"));
             let index: V = decode(cell, self.grid.side()).expect(
                 "Because we are decoding random index within grid \
                  this should work.",

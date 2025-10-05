@@ -89,6 +89,6 @@ where
         Perioditic => samples,
         Normal => newton(samples, dim),
     };
-    let max_radii: F = NumCast::from(MAX_RADII[dim - 2]).unwrap();
+    let max_radii: F = NumCast::from(MAX_RADII[dim - 2]).expect("MAX_RADII value should always be convertible to float type");
     NumFloat::powf(max_radii / F::cast(samples), F::cast(1) / F::cast(dim)) * relative
 }

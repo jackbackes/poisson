@@ -43,7 +43,7 @@ where
             a,
             grid,
             throws: (a * indices.len() as f64).ceil() as usize,
-            range: Uniform::new(0, indices.len()).unwrap(),
+            range: Uniform::new(0, indices.len()).expect("Indices should not be empty at initialization"),
             indices,
             level: 0,
             success: 0,
@@ -103,7 +103,7 @@ where
                     if self.indices.is_empty() {
                         return None;
                     }
-                    self.range = Uniform::new(0, self.indices.len()).unwrap();
+                    self.range = Uniform::new(0, self.indices.len()).expect("Indices should not be empty after removal");
                 } else {
                     let sample = choose_random_sample(rng, &self.grid, cur.clone(), self.level);
                     if is_disk_free(
@@ -120,7 +120,7 @@ where
                             .push(sample.clone());
                         self.indices.swap_remove(index);
                         if !self.indices.is_empty() {
-                            self.range = Uniform::new(0, self.indices.len()).unwrap();
+                            self.range = Uniform::new(0, self.indices.len()).expect("Indices verified to be non-empty");
                         }
                         self.success += 1;
                         return Some(sample);
@@ -131,7 +131,7 @@ where
             if self.indices.is_empty() {
                 return None;
             }
-            self.range = Uniform::new(0, self.indices.len()).unwrap();
+            self.range = Uniform::new(0, self.indices.len()).expect("Indices should not be empty at level advancement");
             self.throws = (self.a * self.indices.len() as f64).ceil() as usize;
             self.level += 1;
         }

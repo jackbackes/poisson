@@ -2,7 +2,7 @@
 name = "poisson-visualisation"
 version = "0.1.0"
 authors = ["WaDelma <>"]
-edition = "2018"
+edition = "2024"
 
 [dependencies]
 nalgebra = { version = "0.34.1", features = ["alga", "rand"] }
