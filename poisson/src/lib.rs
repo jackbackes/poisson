@@ -61,14 +61,14 @@ use rand::Rng;
 use num_traits::Float as NumFloat;
 use num_traits::{NumCast, Zero};
 
-use alga::general::{AbstractField, RealField};
-use alga::linear::{FiniteDimVectorSpace, NormedSpace, VectorSpace};
+use alga::general::RealField;
+use alga::linear::{FiniteDimVectorSpace, NormedSpace};
 
 #[macro_use]
 extern crate lazy_static;
 
 use std::marker::PhantomData;
-use std::ops::{AddAssign, DivAssign, Index, IndexMut, MulAssign, SubAssign};
+use std::ops::{AddAssign, DivAssign, MulAssign, SubAssign};
 
 use crate::algorithm::{Algorithm, Creator};
 use crate::utils::math::calc_radius;

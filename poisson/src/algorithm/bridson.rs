@@ -3,8 +3,6 @@ use crate::utils::*;
 use crate::{Builder, Float, Vector};
 
 use num_traits::Float as NumFloat;
-
-use alga::linear::NormedSpace;
 use num_traits::NumCast;
 
 use rand::Rng;
