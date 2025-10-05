@@ -1,6 +1,6 @@
 [package]
 name = "poisson"
-version = "0.10.1"
+version = "0.11.0"
 authors = ["WaDelma <>"]
 description = "Poisson-disk distribution generator."
 repository = "https://github.com/WaDelma/poisson"
