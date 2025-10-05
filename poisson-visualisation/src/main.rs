@@ -1,9 +1,12 @@
-use clap::{Arg, ArgMatches, Command, builder::PossibleValuesParser};
+use clap::{builder::PossibleValuesParser, Arg, ArgMatches, Command};
 
-use poisson::{Builder, Type, algorithm::{Bridson, Ebeida}};
+use poisson::{
+    algorithm::{Bridson, Ebeida},
+    Builder, Type,
+};
 
-use rand::{Rng, seq::SliceRandom, SeedableRng, rng};
 use rand::rngs::SmallRng;
+use rand::{rng, seq::SliceRandom, Rng, SeedableRng};
 
 use nalgebra::Vector2;
 
@@ -19,7 +22,7 @@ use std::str::FromStr;
 #[derive(PartialEq, Debug, Clone, Copy)]
 pub enum Algo {
     Ebeida,
-    Bridson
+    Bridson,
 }
 
 impl FromStr for Algo {
@@ -29,7 +32,7 @@ impl FromStr for Algo {
         match s.to_lowercase().as_str() {
             "ebeida" => Ok(Algo::Ebeida),
             "bridson" => Ok(Algo::Bridson),
-            _ => Err(format!("Invalid algorithm: {}", s))
+            _ => Err(format!("Invalid algorithm: {}", s)),
         }
     }
 }
@@ -38,7 +41,7 @@ impl FromStr for Algo {
 pub enum Style {
     Plain,
     Colorful,
-    Dot
+    Dot,
 }
 
 impl FromStr for Style {
@@ -49,7 +52,7 @@ impl FromStr for Style {
             "plain" => Ok(Style::Plain),
             "colorful" => Ok(Style::Colorful),
             "dot" => Ok(Style::Dot),
-            _ => Err(format!("Invalid style: {}", s))
+            _ => Err(format!("Invalid style: {}", s)),
         }
     }
 }
@@ -63,72 +66,76 @@ fn main() {
             Arg::new("OUTPUT")
                 .help("Output file that's generated")
                 .required(true)
-                .index(1)
+                .index(1),
         )
-        .arg(
-            Arg::new("SEED")
-                .help("Seed for the generation")
-                .index(2)
-        )
+        .arg(Arg::new("SEED").help("Seed for the generation").index(2))
         .arg(
             Arg::new("radius")
                 .short('r')
                 .value_name("RADIUS")
-                .help("Radius of the disks")
+                .help("Radius of the disks"),
         )
         .arg(
             Arg::new("width")
                 .short('w')
                 .value_name("WIDTH")
-                .help("Width of the generated image")
+                .help("Width of the generated image"),
         )
         .arg(
             Arg::new("height")
                 .short('h')
                 .value_name("HEIGHT")
-                .help("Height of the generated image")
+                .help("Height of the generated image"),
         )
         .arg(
             Arg::new("style")
                 .short('s')
                 .value_name("STYLE")
                 .help("Style for the disks")
-                .value_parser(PossibleValuesParser::new(["plain", "colorful", "dot"]))
+                .value_parser(PossibleValuesParser::new(["plain", "colorful", "dot"])),
         )
         .arg(
             Arg::new("algo")
                 .short('a')
                 .help("Algorithm that's used to generate image")
                 .value_name("ALGO")
-                .value_parser(PossibleValuesParser::new(["ebeida", "bridson"]))
+                .value_parser(PossibleValuesParser::new(["ebeida", "bridson"])),
         );
     visualise(app.get_matches());
 }
 
 fn visualise(m: ArgMatches) {
-    let width: u32 = m.get_one::<String>("width")
+    let width: u32 = m
+        .get_one::<String>("width")
         .and_then(|s| s.parse().ok())
         .unwrap_or(1024);
-    let height: u32 = m.get_one::<String>("height")
+    let height: u32 = m
+        .get_one::<String>("height")
         .and_then(|s| s.parse().ok())
         .unwrap_or(1024);
-    let radius: f32 = m.get_one::<String>("radius")
+    let radius: f32 = m
+        .get_one::<String>("radius")
         .and_then(|s| s.parse().ok())
         .unwrap_or(0.02);
-    let algo = m.get_one::<String>("algo")
+    let algo = m
+        .get_one::<String>("algo")
         .and_then(|s| Algo::from_str(s).ok())
         .unwrap_or(Algo::Ebeida);
-    let style = m.get_one::<String>("style")
+    let style = m
+        .get_one::<String>("style")
         .and_then(|s| Style::from_str(s).ok())
         .unwrap_or(Style::Plain);
     let name = m.get_one::<String>("OUTPUT").unwrap();
-    let master_rng = m.get_one::<String>("SEED").map(|s| {
-        let mut fnv = FnvHasher::with_key(0);
-        for b in s.bytes() {
-            fnv.write_u8(b);
-        }
-        SmallRng::seed_from_u64(fnv.finish())
-    }).unwrap_or_else(|| SmallRng::from_rng(&mut rng()));
+    let master_rng = m
+        .get_one::<String>("SEED")
+        .map(|s| {
+            let mut fnv = FnvHasher::with_key(0);
+            for b in s.bytes() {
+                fnv.write_u8(b);
+            }
+            SmallRng::seed_from_u64(fnv.finish())
+        })
+        .unwrap_or_else(|| SmallRng::from_rng(&mut rng()));
 
     let mut style_rng = master_rng.clone();
 
@@ -148,8 +155,9 @@ fn visualise(m: ArgMatches) {
         let col = Rgb(Lab {
             l: style_rng.random::<f32>() * 80. + 10.,
             a: pp.x * 256. - 128.,
-            b: pp.y * 256. - 128.
-        }.to_rgb());
+            b: pp.y * 256. - 128.,
+        }
+        .to_rgb());
 
         let x = p.x * width as f32;
         let y = p.y * height as f32;

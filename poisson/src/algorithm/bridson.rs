@@ -5,8 +5,8 @@ use crate::{Builder, Float, Vector};
 use num_traits::Float as NumFloat;
 use num_traits::NumCast;
 
-use rand::Rng;
 use rand::distr::StandardUniform;
+use rand::Rng;
 use rand_distr::{Distribution, StandardNormal, Uniform};
 
 use sphere::sphere_volume;
@@ -109,9 +109,7 @@ where
             "Grids volume divided by spheres volume should be always \
              castable to usize.",
         );
-        if lower > 0 {
-            lower -= 1;
-        }
+        lower = lower.saturating_sub(1);
         (lower, Some(upper))
     }
 

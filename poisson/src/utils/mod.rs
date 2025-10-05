@@ -2,10 +2,10 @@
 
 use crate::{Builder, Float, Type, Vector};
 
-use num_traits::{NumCast, Float as NumFloat};
+use num_traits::{Float as NumFloat, NumCast};
 
-use rand::Rng;
 use rand::distr::StandardUniform;
+use rand::Rng;
 use rand_distr::Distribution;
 
 use modulo::Mod;
@@ -39,8 +39,8 @@ where
             .to_usize()
             .expect("Expected that dividing 1 by cell width would be legal.");
         Grid {
-            cell: cell,
-            side: side,
+            cell,
+            side,
             data: vec![
                 vec![];
                 side.pow(
@@ -48,7 +48,7 @@ where
                         .expect("Dimension should be always be castable to u32.")
                 )
             ],
-            poisson_type: poisson_type,
+            poisson_type,
             _marker: PhantomData,
         }
     }
@@ -203,7 +203,7 @@ where
 {
     let mut cur = value.clone();
     for n in 0..V::dimension() {
-        cur[n] = cur[n] / F::cast(side);
+        cur[n] /= F::cast(side);
     }
     cur
 }
@@ -225,7 +225,7 @@ where
     // NOTE: This does unnessary checks for corners, but it doesn't affect much in higher dimensions: 5^d vs 5^d - 2d
     each_combination(&[-2, -1, 0, 1, 2])
         .filter_map(|t| grid.get(parent.clone() + t))
-        .flat_map(|t| t)
+        .flatten()
         .all(|v| sqdist(v.clone(), sample.clone(), poisson.poisson_type) >= sqradius)
         && is_valid(poisson, outside, sample)
 }
@@ -312,7 +312,7 @@ where
             for n in 0..V::dimension() {
                 let rem = div % len;
                 div /= len;
-                let choice = self.choices[rem as usize].clone();
+                let choice = self.choices[rem].clone();
                 result[n] = NumCast::from(choice).expect(
                     "Expected that all choices were castable to float without \
                      problems.",
@@ -324,7 +324,7 @@ where
 }
 
 /// Iterates through all combinations of vectors with allowed values as scalars.
-pub fn each_combination<'a, F, FF, V>(choices: &[FF]) -> CombiIter<F, FF, V>
+pub fn each_combination<'a, F, FF, V>(choices: &[FF]) -> CombiIter<'_, F, FF, V>
 where
     F: Float + 'a,
     FF: NumCast,
@@ -332,7 +332,7 @@ where
 {
     CombiIter {
         cur: 0,
-        choices: choices,
+        choices,
         _marker: PhantomData,
     }
 }
@@ -366,9 +366,9 @@ fn mapping_inplace_works() {
     let mut result = vec.clone();
     let func = |t| {
         match t % 3 {
-            0 => (0..0),
-            1 => (0..1),
-            _ => (0..2),
+            0 => 0..0,
+            1 => 0..1,
+            _ => 0..2,
         }
         .map(move |n| t + n)
     };

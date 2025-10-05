@@ -2,8 +2,8 @@
 use poisson::{algorithm, Builder, Float, Type, Vector};
 
 use rand::distr::StandardUniform;
-use rand_distr::Distribution;
 use rand::{rngs::SmallRng, SeedableRng};
+use rand_distr::Distribution;
 
 use num_traits::NumCast;
 
@@ -101,8 +101,13 @@ fn test_algo<'r, T, F, I, A>(
         let mut prefilled = vec![];
         let mut seed = [0u8; 32];
         for j in 0..16 {
-            let primes = [3, 7, 13, 19, 29, 37, 43, 53, 61, 71, 79, 89, 101, 107, 113, 131];
-            let offsets = [2741, 2729, 2713, 2707, 2693, 2687, 2677, 2663, 2657, 2633, 2609, 2591, 2557, 2549, 2539, 2521];
+            let primes = [
+                3, 7, 13, 19, 29, 37, 43, 53, 61, 71, 79, 89, 101, 107, 113, 131,
+            ];
+            let offsets = [
+                2741, 2729, 2713, 2707, 2693, 2687, 2677, 2663, 2657, 2633, 2609, 2591, 2557, 2549,
+                2539, 2521,
+            ];
             seed[j] = (i * primes[j] + offsets[j]) as u8;
             seed[j + 16] = ((i * primes[j] + offsets[j]) >> 8) as u8;
         }
@@ -159,8 +164,13 @@ fn test_algo<'r, T, F, I, A>(
     }
 }
 
-pub fn test_poisson<F, I, T, A>(poisson: I, radius: F, poisson_type: Type, algo: A, does_prefill: bool)
-where
+pub fn test_poisson<F, I, T, A>(
+    poisson: I,
+    radius: F,
+    poisson_type: Type,
+    algo: A,
+    does_prefill: bool,
+) where
     I: Iterator<Item = T>,
     F: Float,
     T: Debug + Vector<F> + Copy,

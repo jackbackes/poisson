@@ -4,8 +4,8 @@ use crate::{Builder, Float, Vector};
 
 use num_traits::Float as NumFloat;
 
-use rand::Rng;
 use rand::distr::StandardUniform;
+use rand::Rng;
 use rand_distr::{Distribution, Uniform};
 
 use sphere::sphere_volume;
@@ -40,11 +40,11 @@ where
             _ => 700. + 100. * dim as f64,
         };
         Algo {
-            a: a,
-            grid: grid,
+            a,
+            grid,
             throws: (a * indices.len() as f64).ceil() as usize,
             range: Uniform::new(0, indices.len()).unwrap(),
-            indices: indices,
+            indices,
             level: 0,
             success: 0,
             outside: vec![],
@@ -127,7 +127,7 @@ where
                     }
                 }
             }
-            self.subdivide(&poisson);
+            self.subdivide(poisson);
             if self.indices.is_empty() {
                 return None;
             }
@@ -166,9 +166,7 @@ where
             "Grids volume divided by spheres volume should be always \
              castable to usize.",
         );
-        if lower > 0 {
-            lower -= 1;
-        }
+        lower = lower.saturating_sub(1);
         // Calculating upper bound should work because there is this many places left in the grid and no more can fit into it.
         let upper = self.grid.cells() - self.success;
         (lower, Some(upper))
@@ -227,8 +225,8 @@ where
         .all(|t| {
             each_combination(&[-2, -1, 0, 1, 2])
                 .filter_map(|t| grid.get(parent.clone() + t))
-                .flat_map(|t| t)
+                .flatten()
                 .any(|v| sqdist(v.clone(), t.clone(), poisson.poisson_type) < sqradius)
-                || !is_valid(poisson, &outside, t)
+                || !is_valid(poisson, outside, t)
         })
 }

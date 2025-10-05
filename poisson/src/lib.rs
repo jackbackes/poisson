@@ -5,7 +5,7 @@
 //! Generates distribution of points in [0, 1)<sup>d</sup> where:
 //!
 //! * For each point there is disk of certain radius which doesn't intersect
-//! with any other disk of other points
+//!   with any other disk of other points
 //! * Samples fill the space uniformly
 //!
 //! Due it's blue noise properties poisson-disk distribution
@@ -23,7 +23,7 @@
 //! extern crate rand;
 //! extern crate nalgebra as na;
 //!
-//! use rand::FromEntropy;
+//! use rand::{SeedableRng, rng};
 //! use rand::rngs::SmallRng;
 //!
 //! use poisson::{Builder, Type, algorithm};
@@ -31,7 +31,7 @@
 //! fn main() {
 //!     let poisson =
 //!         Builder::<_, na::Vector2<f64>>::with_radius(0.1, Type::Normal)
-//!             .build(SmallRng::from_entropy(), algorithm::Ebeida);
+//!             .build(SmallRng::from_rng(&mut rng()), algorithm::Ebeida);
 //!     let samples = poisson.generate();
 //!     println!("{:?}", samples);
 //! }
@@ -43,13 +43,13 @@
 //! ````rust
 //! # extern crate nalgebra as na;
 //! # use poisson::{Builder, Type, algorithm};
-//! # use rand::FromEntropy;
+//! # use rand::{SeedableRng, rng};
 //! # use rand::rngs::SmallRng;
 //!
 //! fn main() {
 //!     let poisson =
 //!         Builder::<_, na::Vector3<f32>>::with_samples(100, 0.9, Type::Perioditic)
-//!             .build(SmallRng::from_entropy(), algorithm::Bridson);
+//!             .build(SmallRng::from_rng(&mut rng()), algorithm::Bridson);
 //!     for sample in poisson {
 //!         println!("{:?}", sample)
 //!     }
@@ -83,14 +83,11 @@ pub trait Float: NumFloat + RealField + AddAssign + SubAssign + MulAssign + DivA
         NumCast::from(n).expect("Casting usize to float should always succeed.")
     }
 }
-impl<T> Float for T where T: NumFloat + RealField + AddAssign + SubAssign + MulAssign + DivAssign
-{}
+impl<T> Float for T where T: NumFloat + RealField + AddAssign + SubAssign + MulAssign + DivAssign {}
 
 /// Describes what vectors are.
 pub trait Vector<F>:
-    Zero
-    + FiniteDimVectorSpace
-    + NormedSpace<ComplexField = F, RealField = F>
+    Zero + FiniteDimVectorSpace + NormedSpace<ComplexField = F, RealField = F>
 where
     F: Float,
 {
@@ -98,26 +95,21 @@ where
 impl<T, F> Vector<F> for T
 where
     F: Float,
-    T: Zero
-        + FiniteDimVectorSpace
-        + NormedSpace<ComplexField = F, RealField = F>
+    T: Zero + FiniteDimVectorSpace + NormedSpace<ComplexField = F, RealField = F>,
 {
 }
 
 /// Enum for determining the type of poisson-disk distribution.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
+#[derive(Default)]
 pub enum Type {
     /// Acts like there is void all around the space placing no restrictions to sides.
+    #[default]
     Normal,
     /// Makes the space to wrap around on edges allowing tiling of the generated poisson-disk distribution.
     Perioditic,
 }
 
-impl Default for Type {
-    fn default() -> Type {
-        Type::Normal
-    }
-}
 
 /// Builder for the generator.
 #[derive(Default, Clone, Debug, PartialEq)]
@@ -145,8 +137,8 @@ where
                 <= NumCast::from(2f64.sqrt() / 2.).expect("Casting constant should always work.")
         );
         Builder {
-            radius: radius,
-            poisson_type: poisson_type,
+            radius,
+            poisson_type,
             _marker: PhantomData,
         }
     }
@@ -159,7 +151,7 @@ where
         Builder {
             radius: relative
                 * NumCast::from(2f64.sqrt() / 2.).expect("Casting constant should always work."),
-            poisson_type: poisson_type,
+            poisson_type,
             _marker: PhantomData,
         }
     }
@@ -172,7 +164,7 @@ where
     pub fn with_samples(samples: usize, relative: F, poisson_type: Type) -> Self {
         Builder {
             radius: calc_radius::<F, V>(samples, relative, poisson_type),
-            poisson_type: poisson_type,
+            poisson_type,
             _marker: PhantomData,
         }
     }
@@ -220,8 +212,8 @@ where
 {
     fn new(poisson: Builder<F, V>, rng: R) -> Self {
         Generator {
-            rng: rng,
-            poisson: poisson,
+            rng,
+            poisson,
             _algo: PhantomData,
         }
     }

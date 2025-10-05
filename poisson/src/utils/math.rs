@@ -3,7 +3,7 @@ use crate::{Float, Type, Vector};
 use num_traits::{Float as NumFloat, NumCast};
 
 // const TAU: f64  = 6.283185307179586476925286766559005768394338798750211641949;
-const HALF_TAU: f64 = 3.141592653589793238462643383279502884197169399375105820974;
+const HALF_TAU: f64 = std::f64::consts::PI;
 
 lazy_static! {
     static ref MAX_PACKING_DENSITIES: [f64; 7] = [
